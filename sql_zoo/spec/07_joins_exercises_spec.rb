@@ -142,3 +142,25 @@ describe "JOIN exercises" do
     end
   end
 end
+
+# == Schema Information
+#
+# Table name: actors
+#
+#  id          :integer      not null, primary key
+#  name        :string
+#
+# Table name: movies
+#
+#  id          :integer      not null, primary key
+#  title       :string
+#  yr          :integer
+#  score       :float
+#  votes       :integer
+#  director_id :integer
+#
+# Table name: castings
+#
+#  movie_id    :integer      not null, primary key
+#  actor_id    :integer      not null, primary key
+#  ord         :integer
