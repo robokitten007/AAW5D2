@@ -98,25 +98,42 @@ def travoltas_busiest_years
   SQL
 end
 
-def andrews_films_and_leads
-  # List the film title and the leading actor for all of the films 'Julie
-  # Andrews' played in.
-  execute(<<-SQL)
+# def andrews_films_and_leads
+#   # List the film title and the leading actor for all of the films 'Julie
+#   # Andrews' played in.
+#   execute(<<-SQL)
 
-  SELECT movies.title, actors.name
-  FROM movies
-  JOIN castings
-    ON movies.id = castings.movie_id
-  JOIN actors
-    ON actors.id = castings.actor_id
-  WHERE castings.ord = 1 AND actors.name = 'Julie Andrews'
-  SQL
-end
+#   SELECT title
+#   FROM movies
+#   WHERE id IN (
+#       SELECT movie_id 
+#       FROM castings
+#       WHERE actor_id = (
+#           SELECT id 
+#           FROM actors 
+#           WHERE name = 'Julie Andrews'
+#       )
+#   )
+
+
+#   SQL
+# end
 
 def prolific_actors
   # Obtain a list in alphabetical order of actors who've had at least 15
   # starring roles.
   execute(<<-SQL)
+  SELECT actors.name
+  FROM movies
+  JOIN castings
+    ON castings.movie_id = movies.id
+  JOIN actors
+    ON actors.id = castings.actor_id
+  WHERE castings.ord = 1
+  GROUP BY actors.name
+  HAVING COUNT(*) >= 15
+  ORDER BY actors.name
+
   SQL
 end
 
@@ -124,11 +141,37 @@ def films_by_cast_size
   # List the films released in the year 1978 ordered by the number of actors
   # in the cast (descending), then by title (ascending).
   execute(<<-SQL)
+SELECT movies.title, COUNT(actor_id) AS num_actors 
+FROM movies
+JOIN castings
+  ON movies.id = castings.movie_id
+WHERE yr = 1978
+GROUP BY movies.title
+ORDER BY num_actors DESC, title ASC
+
   SQL
 end
 
 def colleagues_of_garfunkel
   # List all the people who have played alongside 'Art Garfunkel'.
   execute(<<-SQL)
+  SELECT name 
+  FROM actors
+  WHERE id IN (
+  
+      SELECT actor_id 
+      FROM castings
+      WHERE movie_id IN (
+            SELECT movie_id
+            FROM actors
+            JOIN castings
+              ON actors.id = castings.actor_id
+            WHERE actors.name = 'Art Garfunkel'
+
+      )
+  )  AND name != 'Art Garfunkel'
+
+
   SQL
 end
+
